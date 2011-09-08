@@ -21,5 +21,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'guard-rspec', '~> 0.4.3'
 
   s.files = Dir["lib/**/*"] + ["MIT-LICENSE", "Rakefile", "Gemfile", "README.md"]
+  s.require_paths = ['lib']
 
 end
