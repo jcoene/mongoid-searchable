@@ -26,7 +26,7 @@ module Mongoid
       end
 
       def search(query, options={})
-        keywords = query.to_s.split(' ').map { |s| s.downcase.gsub(/[^a-z0-9]/, '') }.select { |s| s.length >= 2 }.uniq
+        keywords = clean_keywords(query)
         options[:match] ||= :all
         options[:exact] ||= false
 
@@ -44,22 +44,18 @@ module Mongoid
           elsif options[:match].to_sym == :any
             any_in(keywords_field.to_sym => match)
           else
-            where()
+            raise "Please specify either :all or :any to match."
           end
         else
           where()
         end
       end
 
-    end
-
-    module InstanceMethods
-
       def clean_keywords(value)
         words = []
 
         if value.is_a?(String) or value.is_a?(Numeric)
-          words << value.to_s.split(' ').map { |s| s.downcase.gsub(/[^a-z0-9]/, '') }.select { |s| s.length >= 2 }
+          words << value.to_s.downcase.gsub(/<\/?[^>]*>/, '').split(' ').map { |s| s.gsub(/[._:;'"`,?|+={}()!@#%^&*<>~\$\-\\\/\[\]]/, '') }.select { |s| s.length >= 2 }
         elsif value.is_a?(Array) && value.any?
           value.each do |v|
             words << clean_keywords(v)
@@ -73,10 +69,14 @@ module Mongoid
         words.flatten.uniq
       end
 
+    end
+
+    module InstanceMethods
+
       def build_keywords
         keywords = []
         self.class.searchable_fields.each do |f|
-          keywords << clean_keywords(send("#{f}"))
+          keywords << self.class.clean_keywords(send("#{f}"))
         end
         write_attribute(self.class.keywords_field, keywords.flatten.uniq)
       end

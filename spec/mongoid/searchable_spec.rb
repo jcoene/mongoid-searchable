@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require "spec_helper"
 
 describe Mongoid::Searchable do
@@ -59,6 +60,25 @@ describe Mongoid::Searchable do
       business.search_fields.should include 'cupcakes'
     end
 
+    it 'rejects words less than 2 characters long' do
+      abcd = City.create :name => 'A` Bei çç Dey'
+      abcd.keywords.should eql ['bei', 'çç', 'dey']
+    end
+
+    it 'strips html tags' do
+      la = City.create :name => '<color=red>Los</color> <div id="big"><strong>Angeles</strong></div>'
+      la.keywords.should eql ['los', 'angeles']
+    end
+
+    it 'allows unicode characters' do
+      moscow = City.create :name => 'Москва́', :officials => { :mayor => 'Серге́й Семёнович Собя́нин' }
+      athens = City.create :name => 'Αθήνα', :officials => { :mayor => 'Γεώργιος Καμίνης' }
+      tokyo = City.create :name => '東京', :officials => { :governor => '石原 慎太郎' }
+
+      moscow.keywords.should include 'Семёнович'
+      athens.keywords.should include 'Καμίνης'
+      tokyo.keywords.should include '東京'
+    end
   end
 
   context 'indexing' do
@@ -110,6 +130,17 @@ describe Mongoid::Searchable do
     it 'can be chained to other criteria' do
       City.search('bronx').where(:population.gt => 10000).length.should eql 1
       City.search('bronx').where(:population.lt => 10000).length.should eql 0
+    end
+
+    it 'can find unicode words' do
+      City.create :name => '東京', :officials => { :governor => '石原 慎太郎' }
+      City.search('石原').length.should eql 1
+    end
+
+    it 'should handle empty searches' do
+      City.search('').length.should eql 1
+      City.search('a').length.should eql 1
+      City.search('ap').length.should eql 1
     end
 
   end
