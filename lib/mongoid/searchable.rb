@@ -12,6 +12,27 @@ module Mongoid
 
     module ClassMethods
 
+      # Defines the environment for searching this document,
+      # typically called from within your model declaration.
+      #
+      # fields - Array, mix of references to the fields
+      #  you would like to index and any *options*.
+      #
+      # options - Hash, list of options for keyword indexing:
+      #
+      #   :as - String, field to store keywords in.
+      #   :index - Boolean, turn indexing on or off.
+      #
+      # Example:
+      #
+      # class Person
+      #   include Mongoid::Document
+      #   include Mongoid::Searchable
+      #   field :name
+      #   searchable :name
+      # end
+      #
+      # Returns nothing.
       def searchable(*fields)
         options = { :as => :keywords, :index => true }.merge(fields.extract_options!)
 
@@ -25,6 +46,19 @@ module Mongoid
 
       end
 
+      # Search for documents matching your query, given the previously
+      # defined keyword fields.
+      #
+      # query - Integer, String, Array, Hash representing the query
+      #  you wish to perform. This will be reduced to a string, sanitized
+      #  and then split into keywords used for matching.
+      #
+      # options - Hash, containing options used for the query:
+      #
+      #   :match - Symbol, :all or :any, how to match results.
+      #   :exact - Boolean, require exact word match (or not).
+      #
+      # Returns Mongoid::Criteria.
       def search(query, options={})
         keywords = clean_keywords(query)
         options[:match] ||= :all
@@ -51,6 +85,12 @@ module Mongoid
         end
       end
 
+      # Takes a String, Numeric, Array or Hash and reduces it to a
+      # sanitized array of keywords, recursively if necessary.
+      #
+      # value - String, Numeric, Array or Hash of data to sanitize.
+      #
+      # Returns Array.
       def clean_keywords(value)
         words = []
 
@@ -73,6 +113,11 @@ module Mongoid
 
     module InstanceMethods
 
+      # Builds a list of keywords contained in the document given the
+      # keyword fields previously declared and stores them in the
+      # keywords field
+      #
+      # Returns nothing.
       def build_keywords
         keywords = []
         self.class.searchable_fields.each do |f|
