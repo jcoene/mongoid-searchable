@@ -2,6 +2,8 @@
 
 Mongoid Searchable provides simple field search for your Mongoid models using the full-text search technique described in the [MongoDB documentation](http://www.mongodb.org/display/DOCS/Full+Text+Search+in+Mongo).
 
+[![travis](https://secure.travis-ci.org/jcoene/mongoid-searchable.png)](http://travis-ci.org/jcoene/mongoid-searchable)
+
 ## Getting Started
 
 First, add mongoid-searchable to your Gemfile:
