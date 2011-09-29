@@ -65,7 +65,7 @@ module Mongoid
         options[:exact] ||= false
 
         if options[:exact]
-          match = keywords.collect{|k| /^#{Regexp.escape(k)}$/ }
+          match = keywords
         else
           match = keywords.collect{|k| /#{Regexp.escape(k)}/ }
         end

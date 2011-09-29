@@ -120,6 +120,7 @@ describe Mongoid::Searchable do
     it 'can search with exact word match' do
       City.search('Queen', :exact => true).length.should eql 0
       City.search('Queens', :exact => true).length.should eql 1
+      City.search('Manhattan, New York', :exact => true).length.should eql 1
     end
 
     it 'can find more than 1 record' do
