@@ -43,7 +43,6 @@ module Mongoid
         index :keywords if options[:index]
 
         before_save :build_keywords
-
       end
 
       # Search for documents matching your query, given the previously
@@ -59,7 +58,7 @@ module Mongoid
       #   :exact - Boolean, require exact word match (or not).
       #
       # Returns Mongoid::Criteria.
-      def search(query, options={})
+      def text_search(query, options={})
         keywords = clean_keywords(query)
         options[:match] ||= :all
         options[:exact] ||= false

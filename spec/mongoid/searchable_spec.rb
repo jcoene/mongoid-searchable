@@ -105,43 +105,49 @@ describe Mongoid::Searchable do
       city
     end
 
+    it 'responds to text_search method' do
+      City.should respond_to(:text_search)
+    end
+
     it 'searches for all by default' do
-      City.search('new california').length.should eql 0
+      City.text_search('new california').length.should eql 0
     end
 
     it 'can search for any' do
-      City.search('new california', :match => :any).length.should eql 1
+      City.text_search('new california', :match => :any).length.should eql 1
     end
 
     it 'searches without exact word match by default' do
-      City.search('Queen').length.should eql 1
+      City.text_search('Queen').length.should eql 1
     end
 
     it 'can search with exact word match' do
-      City.search('Queen', :exact => true).length.should eql 0
-      City.search('Queens', :exact => true).length.should eql 1
-      City.search('Manhattan, New York', :exact => true).length.should eql 1
+      City.text_search('Queen', :exact => true).length.should eql 0
+      City.text_search('Queens', :exact => true).length.should eql 1
+      City.text_search('Manhattan, New York', :exact => true).length.should eql 1
     end
 
     it 'can find more than 1 record' do
       City.create :name => 'Yorkshire'
-      City.search('york').length.should eql 2
+      City.text_search('york').length.should eql 2
     end
 
     it 'can be chained to other criteria' do
-      City.search('bronx').where(:population.gt => 10000).length.should eql 1
-      City.search('bronx').where(:population.lt => 10000).length.should eql 0
+      City.text_search('bronx').where(:population.gt => 10000).length.should eql 1
+      City.where(:population.gt => 10000).text_search('bronx').length.should eql 1
+      City.text_search('bronx').where(:population.lt => 10000).length.should eql 0
+      City.where(:population.lt => 10000).text_search('bronx').length.should eql 0
     end
 
     it 'can find unicode words' do
       City.create :name => '東京', :officials => { :governor => '石原 慎太郎' }
-      City.search('石原').length.should eql 1
+      City.text_search('石原').length.should eql 1
     end
 
     it 'should handle empty searches' do
-      City.search('').length.should eql 1
-      City.search('a').length.should eql 1
-      City.search('ap').length.should eql 1
+      City.text_search('').length.should eql 1
+      City.text_search('a').length.should eql 1
+      City.text_search('ap').length.should eql 1
     end
 
   end

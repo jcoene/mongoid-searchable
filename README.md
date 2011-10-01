@@ -4,6 +4,10 @@ Mongoid Searchable provides simple field search for your Mongoid models using th
 
 [![travis](https://secure.travis-ci.org/jcoene/mongoid-searchable.png)](http://travis-ci.org/jcoene/mongoid-searchable)
 
+## 0.1.x Compatibility
+
+Please note that version **0.2.0 has renamed the *search* method to *text_search* to avoid naming issues**. Sorry for the inconvenience but given the issues this can cause and limited alternative solutions, I figured that it would be prudent to make this change sooner rather than later.
+
 ## Getting Started
 
 First, add mongoid-searchable to your Gemfile:
@@ -40,30 +44,30 @@ City.create :name => 'Rochester, NY', :population => 1_098_201,
 City.create :name => 'Rochester, MN', :population => 186_011,
             :officials => { 'Mayor' => 'Ardell Brede', 'Governor' => 'Mark Dayton' }
 
-City.search('ny')        # => 2 records
-City.search('rochester') # => 2 records
-City.search('manhattan') # => 1 record
+City.text_search('ny')        # => 2 records
+City.text_search('rochester') # => 2 records
+City.text_search('manhattan') # => 1 record
 ```
 
 You can also choose to match all or any tokens. The default is to match **all** terms:
 
 ```ruby
-City.search('rochester ny')                 # => 1 record (defaults to all)
-City.search('rochester ny', :match => :any) # => 3 records
+City.text_search('rochester ny')                 # => 1 record (defaults to all)
+City.text_search('rochester ny', :match => :any) # => 3 records
 ```
 
 We can match partial or exact words as well. The default is to match **partial** words:
 
 ```ruby
-City.search('roch')                 # => 2 records
-City.search('roch', :exact => true) # => 0 records
+City.text_search('roch')                 # => 2 records
+City.text_search('roch', :exact => true) # => 0 records
 ```
 
 You can chain other criteria on to your search, as per Mongoid convention:
 
 ```ruby
-City.search('ny').where(:population.gt => 2_000_000)      # => 1 record
-City.search('rochester').where(:population.lt => 500_000) # => 1 record
+City.text_search('ny').where(:population.gt => 2_000_000)      # => 1 record
+City.text_search('rochester').where(:population.lt => 500_000) # => 1 record
 ```
 
 ## Customization
