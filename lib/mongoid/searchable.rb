@@ -110,7 +110,6 @@ module Mongoid
 
     end
 
-    module InstanceMethods
 
       # Builds a list of keywords contained in the document given the
       # keyword fields previously declared and stores them in the
@@ -125,7 +124,6 @@ module Mongoid
         write_attribute(self.class.keywords_field, keywords.flatten.uniq)
       end
 
-    end
 
   end
 
